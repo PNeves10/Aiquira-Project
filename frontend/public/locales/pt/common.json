@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "home": "Início",
+    "assets": "Ativos",
+    "services": "Serviços",
+    "about": "Sobre",
+    "login": "Entrar",
+    "register": "Registrar",
+    "profile": "Perfil",
+    "logout": "Sair"
+  },
+  "footer": {
+    "about": "Sobre Nós",
+    "services": "Serviços",
+    "contact": "Contato",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Serviço",
+    "rights": "Todos os direitos reservados."
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar no AIQuira",
+      "email": "Endereço de email",
+      "password": "Senha",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu sua senha?",
+      "noAccount": "Não tem uma conta?",
+      "registerLink": "Registre-se aqui"
+    },
+    "register": {
+      "title": "Criar uma conta",
+      "name": "Nome completo",
+      "email": "Endereço de email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Criar conta",
+      "haveAccount": "Já tem uma conta?",
+      "loginLink": "Entre aqui"
+    }
+  },
+  "assets": {
+    "list": {
+      "title": "Ativos Disponíveis",
+      "noAssets": "Nenhum ativo encontrado",
+      "filter": "Filtrar ativos",
+      "sort": "Ordenar por"
+    },
+    "details": {
+      "price": "Preço",
+      "status": "Status",
+      "type": "Tipo",
+      "description": "Descrição",
+      "contact": "Contatar vendedor",
+      "valuation": "Obter Avaliação IA"
+    }
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "success": "Operação bem-sucedida",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "sort": "Ordenar"
+  }
+} 

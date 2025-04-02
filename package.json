@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@storybook/addon-a11y": "^8.6.11",
+    "@storybook/addon-essentials": "^8.6.11",
+    "@storybook/addon-interactions": "^8.6.11",
+    "@storybook/addon-links": "^8.6.11",
+    "@storybook/blocks": "^8.6.11",
+    "@storybook/react": "^8.6.11",
+    "@storybook/testing-library": "^0.2.1"
+  },
+  "dependencies": {
+    "@sentry/nextjs": "^9.10.1",
+    "@sentry/replay": "^7.116.0",
+    "@sentry/tracing": "^7.120.3"
+  }
+}

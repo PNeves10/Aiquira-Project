@@ -1,0 +1,49 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/ai-services"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "pip"
+      include: "scope"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # Ignore major version updates for critical dependencies
+      - dependency-name: "fastapi"
+        versions: [">=1.0.0"]
+      - dependency-name: "pydantic"
+        versions: [">=2.0.0"]
+
+  # Node.js dependencies
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # Ignore major version updates for critical dependencies
+      - dependency-name: "next"
+        versions: [">=13.0.0"]
+      - dependency-name: "react"
+        versions: [">=18.0.0"] 

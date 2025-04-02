@@ -1,0 +1,141 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        node-version: [16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    # Set up Node.js
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # Install backend dependencies
+    - name: Install backend dependencies
+      run: |
+        cd ai-services
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+
+    # Install frontend dependencies
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    # Run backend tests
+    - name: Run backend tests
+      run: |
+        cd ai-services
+        pytest --cov=src --cov-report=xml
+
+    # Run frontend tests
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test
+        npm run test:e2e
+
+    # Upload coverage reports
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./ai-services/coverage.xml
+        fail_ci_if_error: true
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    # Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        cd ai-services
+        pip install flake8 black isort
+        cd ../frontend
+        npm ci
+
+    # Run Python linters
+    - name: Run Python linters
+      run: |
+        cd ai-services
+        flake8 src
+        black --check src
+        isort --check-only src
+
+    # Run TypeScript linters
+    - name: Run TypeScript linters
+      run: |
+        cd frontend
+        npm run lint
+        npm run type-check
+
+  deploy:
+    needs: [test, lint]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    # Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    # Build frontend
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    # Deploy to production
+    - name: Deploy to production
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      run: |
+        # Add your deployment steps here
+        echo "Deploying to production..." 

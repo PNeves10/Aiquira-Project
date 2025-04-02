@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "home": "Home",
+    "assets": "Assets",
+    "services": "Services",
+    "about": "About",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "footer": {
+    "about": "About Us",
+    "services": "Services",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved."
+  },
+  "auth": {
+    "login": {
+      "title": "Login to AIQuira",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register here"
+    },
+    "register": {
+      "title": "Create an account",
+      "name": "Full name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Login here"
+    }
+  },
+  "assets": {
+    "list": {
+      "title": "Available Assets",
+      "noAssets": "No assets found",
+      "filter": "Filter assets",
+      "sort": "Sort by"
+    },
+    "details": {
+      "price": "Price",
+      "status": "Status",
+      "type": "Type",
+      "description": "Description",
+      "contact": "Contact seller",
+      "valuation": "Get AI Valuation"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  }
+} 

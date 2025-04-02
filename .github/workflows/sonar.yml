@@ -1,0 +1,56 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        cd ai-services
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pylint
+        cd ../frontend
+        npm ci
+
+    - name: Run tests and generate coverage
+      run: |
+        cd ai-services
+        pytest --cov=src --cov-report=xml
+        pylint src > pylint-report.txt
+        cd ../frontend
+        npm test -- --coverage
+
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=aiquira
+          -Dsonar.sources=.
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.python.coverage.reportPaths=ai-services/coverage.xml
+          -Dsonar.python.pylint.reportPaths=ai-services/pylint-report.txt
+          -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov-report/index.html 
