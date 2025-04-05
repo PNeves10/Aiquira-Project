@@ -1,0 +1,109 @@
+.dashboard {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.dashboard .ant-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.dashboard .ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard .ant-progress-circle {
+  margin: 0 auto;
+  display: block;
+}
+
+.dashboard .ant-statistic {
+  text-align: center;
+}
+
+.dashboard .ant-list-item {
+  padding: 12px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dashboard .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.dashboard .ant-list-item-meta-title {
+  margin-bottom: 4px;
+}
+
+.dashboard .ant-list-item-meta-description {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.dashboard .ant-tag {
+  margin-right: 0;
+}
+
+.dashboard .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.dashboard .ant-progress-text {
+  font-size: 16px;
+}
+
+.dashboard .ant-statistic-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.dashboard .ant-statistic-content {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.dashboard .ant-list-item-action {
+  margin-left: 24px;
+}
+
+.dashboard .ant-list-item-meta-avatar {
+  margin-right: 16px;
+}
+
+.dashboard .ant-list-item-meta-content {
+  flex: 1;
+}
+
+.dashboard .ant-list-item-meta-title {
+  margin-bottom: 4px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.dashboard .ant-list-item-meta-description {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.dashboard .ant-tag {
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.dashboard .ant-progress-circle .ant-progress-text {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.dashboard .ant-progress-circle .ant-progress-text .ant-typography {
+  margin-bottom: 0;
+}
+
+.dashboard .ant-progress-circle .ant-typography-secondary {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+} 

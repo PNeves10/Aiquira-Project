@@ -1,0 +1,191 @@
+/* RTL-specific styles */
+[dir="rtl"] {
+  /* Layout */
+  .analysis-container {
+    direction: rtl;
+  }
+
+  /* Risk Score */
+  .risk-score {
+    transform: scaleX(-1);
+  }
+
+  /* Market Insights */
+  .market-insights {
+    text-align: right;
+  }
+
+  /* Issues List */
+  .issues-list {
+    padding-right: 0;
+    padding-left: 1rem;
+  }
+
+  /* Recommendations */
+  .recommendations-list {
+    padding-right: 0;
+    padding-left: 1rem;
+  }
+
+  /* Navigation */
+  .nav-item {
+    margin-right: 0;
+    margin-left: 1rem;
+  }
+
+  /* Forms */
+  .form-group {
+    text-align: right;
+  }
+
+  .input-group {
+    flex-direction: row-reverse;
+  }
+
+  /* Buttons */
+  .btn-icon {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  /* Tables */
+  .table th,
+  .table td {
+    text-align: right;
+  }
+
+  /* Modals */
+  .modal-header {
+    flex-direction: row-reverse;
+  }
+
+  .modal-footer {
+    flex-direction: row-reverse;
+  }
+
+  /* Dropdowns */
+  .dropdown-menu {
+    text-align: right;
+  }
+
+  /* Tooltips */
+  .tooltip {
+    right: 100%;
+    left: auto;
+  }
+
+  /* Pagination */
+  .pagination {
+    flex-direction: row-reverse;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumb {
+    flex-direction: row-reverse;
+  }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    margin-right: 0.5rem;
+    margin-left: 0;
+  }
+
+  /* Tabs */
+  .nav-tabs {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .nav-tabs .nav-link {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  /* Accordion */
+  .accordion-button::after {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  /* Progress */
+  .progress-bar {
+    float: right;
+  }
+
+  /* Badges */
+  .badge {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  /* Alerts */
+  .alert {
+    text-align: right;
+  }
+
+  /* Cards */
+  .card-header {
+    text-align: right;
+  }
+
+  /* Lists */
+  .list-group-item {
+    text-align: right;
+  }
+
+  /* Icons */
+  .icon {
+    transform: scaleX(-1);
+  }
+
+  /* Custom Components */
+  .language-selector {
+    direction: ltr;
+  }
+
+  .rtl-flex {
+    flex-direction: row-reverse;
+  }
+
+  /* Animations */
+  .slide-in {
+    transform: translateX(100%);
+  }
+
+  .slide-out {
+    transform: translateX(-100%);
+  }
+}
+
+/* RTL-specific utility classes */
+.rtl-text {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-margin {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+.rtl-padding {
+  padding-right: 0;
+  padding-left: 1rem;
+}
+
+.rtl-border {
+  border-right: none;
+  border-left: 1px solid;
+}
+
+.rtl-flex-row {
+  flex-direction: row-reverse;
+}
+
+.rtl-float {
+  float: right;
+}
+
+.rtl-transform {
+  transform: scaleX(-1);
+} 

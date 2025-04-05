@@ -1,0 +1,21 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run type checking
+npm run type-check
+
+# Run linting
+npm run lint
+
+# Run tests
+npm run test
+
+# Run code coverage check
+npm run test:coverage
+
+# Check if coverage meets requirements
+COVERAGE=$(cat coverage/coverage-final.json | jq -r '.total.lines.pct')
+if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+  echo "❌ Code coverage is below 80%"
+  exit 1
+fi 

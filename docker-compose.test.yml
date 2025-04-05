@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=test
+      - MONGODB_URI=mongodb://mongodb:27017/test
+      - JWT_SECRET=test_secret
+      - SENTRY_DSN=test_dsn
+      - PORT=3000
+    depends_on:
+      - mongodb
+    command: npm run test
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_test_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=test
+      - MONGO_INITDB_ROOT_PASSWORD=test
+
+volumes:
+  mongodb_test_data: 

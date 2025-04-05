@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Due Diligence Analysis Failed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f44336;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .content {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #c62828;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Due Diligence Analysis Failed</h1>
+        <p>{{ company_name }}</p>
+    </div>
+
+    <div class="content">
+        <p>Dear Valued Client,</p>
+        
+        <p>We regret to inform you that we encountered an error while processing your due diligence analysis request for <strong>{{ company_name }}</strong>.</p>
+
+        <div class="error-message">
+            <h3>Error Details</h3>
+            <p>{{ error_message }}</p>
+        </div>
+
+        <p>Request Details:</p>
+        <ul>
+            <li><strong>Request ID:</strong> {{ request_id }}</li>
+            <li><strong>Company:</strong> {{ company_name }}</li>
+        </ul>
+
+        <p>Our team has been notified and will investigate the issue. You can try the following:</p>
+        <ul>
+            <li>Check if all uploaded documents are in the correct format (PDF, Excel, etc.)</li>
+            <li>Ensure all documents are readable and not password protected</li>
+            <li>Try submitting the request again</li>
+        </ul>
+
+        <a href="https://aiquira.com/support" class="button">Contact Support</a>
+
+        <div class="footer">
+            <p>This is an automated message from AIQuira Due Diligence Express. Please do not reply to this email.</p>
+            <p>If you need immediate assistance, please contact our support team at support@aiquira.com</p>
+        </div>
+    </div>
+</body>
+</html> 

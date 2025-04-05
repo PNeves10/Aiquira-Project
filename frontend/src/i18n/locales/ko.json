@@ -1,0 +1,39 @@
+{
+  "analysis": {
+    "riskScore": {
+      "title": "리스크 점수",
+      "low": "낮은 리스크",
+      "medium": "중간 리스크",
+      "high": "높은 리스크"
+    },
+    "marketInsights": {
+      "title": "시장 인사이트",
+      "trend": {
+        "positive": "긍정적",
+        "neutral": "중립적",
+        "negative": "부정적"
+      },
+      "confidence": "신뢰도",
+      "factors": "주요 요인"
+    },
+    "issues": {
+      "title": "식별된 문제",
+      "severity": {
+        "high": "높음",
+        "medium": "중간",
+        "low": "낮음"
+      },
+      "impact": "영향",
+      "resolution": "권장 해결책"
+    },
+    "recommendations": {
+      "title": "권장사항"
+    }
+  },
+  "common": {
+    "loading": "분석 로딩 중...",
+    "error": "분석 로딩 중 오류 발생",
+    "retry": "재시도",
+    "refresh": "새로고침"
+  }
+} 

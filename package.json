@@ -1,17 +1,107 @@
 {
-  "devDependencies": {
-    "@playwright/test": "^1.51.1",
-    "@storybook/addon-a11y": "^8.6.11",
-    "@storybook/addon-essentials": "^8.6.11",
-    "@storybook/addon-interactions": "^8.6.11",
-    "@storybook/addon-links": "^8.6.11",
-    "@storybook/blocks": "^8.6.11",
-    "@storybook/react": "^8.6.11",
-    "@storybook/testing-library": "^0.2.1"
+  "name": "ai-quira",
+  "version": "1.0.0",
+  "description": "AI-powered financial analysis platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "docker:build": "docker build -t ai-quira .",
+    "docker:run": "docker run -p 3000:3000 ai-quira",
+    "docker:test": "docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit",
+    "deploy:staging": "npm run build && npm run test && npm run lint && npm run type-check",
+    "deploy:production": "npm run deploy:staging && docker build -t ai-quira .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "validate": "npm run type-check && npm run lint && npm run test && npm run format:check"
   },
   "dependencies": {
-    "@sentry/nextjs": "^9.10.1",
-    "@sentry/replay": "^7.116.0",
-    "@sentry/tracing": "^7.120.3"
+    "@sentry/node": "^7.0.0",
+    "@sentry/profiling-node": "^1.0.0",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0",
+    "winston": "^3.8.0",
+    "winston-daily-rotate-file": "^4.6.0",
+    "dotenv": "^16.0.0",
+    "cors": "^2.8.5",
+    "helmet": "^6.0.0",
+    "express-rate-limit": "^6.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "express-validator": "^7.0.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^8.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-security": "^1.7.0",
+    "eslint-plugin-testing-library": "^5.11.0",
+    "husky": "^8.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "lint-staged": "^13.0.0",
+    "prettier": "^2.8.0",
+    "supertest": "^6.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.9.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^4.9.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "jest --bail --findRelatedTests"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/test/setup.ts"
+    ],
+    "coverageDirectory": "./coverage",
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/**/*.test.{ts,tsx}",
+      "!src/**/*.spec.{ts,tsx}",
+      "!src/test/**/*"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
   }
 }

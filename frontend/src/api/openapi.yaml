@@ -1,0 +1,382 @@
+openapi: 3.0.0
+info:
+  title: AI Analysis API
+  version: 1.0.0
+  description: API for retrieving AI-powered analysis of assets
+  contact:
+    name: API Support
+    email: support@aiquira.com
+
+servers:
+  - url: /api
+    description: API base URL
+
+components:
+  schemas:
+    RiskScore:
+      type: object
+      properties:
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Risk score value between 0 and 100
+      required:
+        - score
+
+    MarketInsights:
+      type: object
+      properties:
+        trend:
+          type: string
+          enum: [positive, neutral, negative]
+          description: Market trend direction
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Confidence level in the analysis
+        factors:
+          type: array
+          items:
+            type: string
+          description: List of key market factors
+      required:
+        - trend
+        - confidence
+        - factors
+
+    Issue:
+      type: object
+      properties:
+        severity:
+          type: string
+          enum: [high, medium, low]
+          description: Issue severity level
+        description:
+          type: string
+          description: Issue description
+        impact:
+          type: string
+          description: Impact of the issue
+        resolution:
+          type: string
+          description: Recommended resolution steps
+      required:
+        - severity
+        - description
+        - impact
+        - resolution
+
+    AIAnalysisResult:
+      type: object
+      properties:
+        riskScore:
+          $ref: '#/components/schemas/RiskScore'
+        marketInsights:
+          $ref: '#/components/schemas/MarketInsights'
+        recommendations:
+          type: array
+          items:
+            type: string
+          description: List of recommendations
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue'
+      required:
+        - riskScore
+        - marketInsights
+        - recommendations
+        - issues
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: string
+          description: Technical details
+      required:
+        - message
+
+    BatchAnalysisRequest:
+      type: object
+      properties:
+        assetIds:
+          type: array
+          items:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+          description: List of asset IDs to analyze
+        options:
+          type: object
+          properties:
+            includeHistoricalData:
+              type: boolean
+              description: Whether to include historical analysis data
+            analysisDepth:
+              type: string
+              enum: [basic, detailed, comprehensive]
+              description: Level of analysis detail
+          default:
+            includeHistoricalData: false
+            analysisDepth: basic
+
+    BatchAnalysisResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              assetId:
+                type: string
+                description: Asset identifier
+              analysis:
+                $ref: '#/components/schemas/AIAnalysisResult'
+              timestamp:
+                type: string
+                format: date-time
+                description: Analysis timestamp
+        summary:
+          type: object
+          properties:
+            totalAssets:
+              type: integer
+              description: Total number of assets analyzed
+            averageRiskScore:
+              type: number
+              description: Average risk score across all assets
+            riskDistribution:
+              type: object
+              properties:
+                low:
+                  type: integer
+                  description: Number of low-risk assets
+                medium:
+                  type: integer
+                  description: Number of medium-risk assets
+                high:
+                  type: integer
+                  description: Number of high-risk assets
+
+    HistoricalAnalysis:
+      type: object
+      properties:
+        assetId:
+          type: string
+          description: Asset identifier
+        analyses:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                description: Analysis timestamp
+              riskScore:
+                $ref: '#/components/schemas/RiskScore'
+              marketInsights:
+                $ref: '#/components/schemas/MarketInsights'
+              issues:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+
+paths:
+  /analysis/{assetId}:
+    get:
+      summary: Get AI Analysis
+      description: Retrieve AI-powered analysis for a specific asset
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+          description: Unique identifier of the asset
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAnalysisResult'
+        '400':
+          description: Invalid asset ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /analysis/batch:
+    post:
+      summary: Batch Analysis
+      description: Analyze multiple assets in a single request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchAnalysisRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAnalysisResult'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /analysis/{assetId}/history:
+    get:
+      summary: Get Historical Analysis
+      description: Retrieve historical analysis data for an asset
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+          description: Unique identifier of the asset
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Start date for historical data
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: End date for historical data
+        - name: interval
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+            default: daily
+          description: Time interval for historical data
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalAnalysis'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /analysis/{assetId}/export:
+    get:
+      summary: Export Analysis Report
+      description: Export analysis results in various formats
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+          description: Unique identifier of the asset
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pdf, csv, json]
+            default: pdf
+          description: Export format
+        - name: includeCharts
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: Whether to include charts in the export
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAnalysisResult'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 

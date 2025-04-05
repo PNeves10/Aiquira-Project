@@ -1,141 +1,332 @@
-name: CI/CD
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+env:
+  NODE_ENV: production
+  AWS_REGION: eu-west-2
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  EMAIL_NOTIFICATION: ${{ secrets.EMAIL_NOTIFICATION }}
 
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+    - name: Run OWASP dependency check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'AIQuira'
+        path: '.'
+        format: 'HTML'
+        out: 'reports'
+        args: >
+          --suppression ./.dependency-check/suppressions.xml
+          --failOnCVSS 7
+          --enableRetired
+
+    - name: Run npm audit
+      run: npm audit
+
+    - name: Run SonarQube analysis
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Run container security scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        format: 'table'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Run SAST scan
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: javascript
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          reports/
+          npm-audit.json
+          sonarqube-report/
+          trivy-report/
+          codeql-report/
+
+  dependency-updates:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check for outdated dependencies
+      run: npm outdated
+
+    - name: Update dependencies
+      run: |
+        npm update
+        npm audit fix
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        commit-message: 'chore: update dependencies'
+        title: 'chore: update dependencies'
+        body: 'Automated dependency updates'
+        branch: chore/update-dependencies
+
   test:
+    needs: [security, dependency-updates]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        environment: [staging, production]
         node-version: [16.x, 18.x]
 
     steps:
     - uses: actions/checkout@v3
 
-    # Set up Python
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    # Set up Node.js
-    - name: Set up Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    # Install backend dependencies
-    - name: Install backend dependencies
-      run: |
-        cd ai-services
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
+    - name: Install dependencies
+      run: npm ci
 
-    # Install frontend dependencies
-    - name: Install frontend dependencies
-      run: |
-        cd frontend
-        npm ci
+    - name: Run unit tests
+      run: npm test -- --coverage
 
-    # Run backend tests
-    - name: Run backend tests
-      run: |
-        cd ai-services
-        pytest --cov=src --cov-report=xml
+    - name: Run integration tests
+      run: npm run test:integration
 
-    # Run frontend tests
-    - name: Run frontend tests
-      run: |
-        cd frontend
-        npm test
-        npm run test:e2e
+    - name: Run end-to-end tests
+      run: npm run test:e2e
 
-    # Upload coverage reports
+    - name: Run performance tests
+      run: npm run test:performance
+
+    - name: Run accessibility tests
+      run: npm run test:accessibility
+
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
       with:
-        file: ./ai-services/coverage.xml
-        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
 
-  lint:
+    - name: Generate test report
+      run: |
+        echo "Test Report for ${{ matrix.environment }}" > test-report.md
+        echo "Node Version: ${{ matrix.node-version }}" >> test-report.md
+        echo "Test Results:" >> test-report.md
+        cat coverage/coverage-summary.json >> test-report.md
+
+  build:
+    needs: test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [staging, production]
+        include:
+          - environment: staging
+            aws-region: eu-west-2
+          - environment: production
+            aws-region: eu-west-2
+
     steps:
     - uses: actions/checkout@v3
 
-    # Set up Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    # Set up Node.js
-    - name: Set up Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: '18'
         cache: 'npm'
 
-    # Install dependencies
-    - name: Install dependencies
-      run: |
-        cd ai-services
-        pip install flake8 black isort
-        cd ../frontend
-        npm ci
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ matrix.aws-region }}
 
-    # Run Python linters
-    - name: Run Python linters
-      run: |
-        cd ai-services
-        flake8 src
-        black --check src
-        isort --check-only src
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-    # Run TypeScript linters
-    - name: Run TypeScript linters
+    - name: Build and push Docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: aiquira-${{ matrix.environment }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        cd frontend
-        npm run lint
-        npm run type-check
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-${{ matrix.environment }}
+        path: build/
 
   deploy:
-    needs: [test, lint]
-    if: github.ref == 'refs/heads/main'
+    needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        environment: [staging, production]
+        include:
+          - environment: staging
+            aws-region: eu-west-2
+            cluster: staging-cluster
+          - environment: production
+            aws-region: eu-west-2
+            cluster: production-cluster
+
     steps:
     - uses: actions/checkout@v3
 
-    # Set up Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        python-version: '3.9'
-    
-    # Set up Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ matrix.aws-region }}
 
-    # Build frontend
-    - name: Build frontend
+    - name: Update ECS service
       run: |
-        cd frontend
-        npm ci
-        npm run build
+        aws ecs update-service --cluster ${{ matrix.cluster }} \
+          --service aiquira-service \
+          --force-new-deployment \
+          --region ${{ matrix.aws-region }}
 
-    # Deploy to production
-    - name: Deploy to production
+    - name: Wait for deployment
+      run: |
+        aws ecs wait services-stable \
+          --cluster ${{ matrix.cluster }} \
+          --services aiquira-service \
+          --region ${{ matrix.aws-region }}
+
+  performance-monitoring:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        environment: [staging, production]
+
+    steps:
+    - name: Run Lighthouse CI
+      run: npm run lighthouse
+
+    - name: Run k6 performance tests
+      run: |
+        k6 run performance-tests/${{ matrix.environment }}.js
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report-${{ matrix.environment }}
+        path: |
+          .lighthouseci/
+          k6-report/
+
+  accessibility-monitoring:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        environment: [staging, production]
+
+    steps:
+    - name: Run accessibility monitoring
+      run: npm run accessibility:monitor
+
+    - name: Upload accessibility report
+      uses: actions/upload-artifact@v3
+      with:
+        name: accessibility-report-${{ matrix.environment }}
+        path: accessibility-reports/
+
+  notify:
+    needs: [test, security, performance-monitoring, accessibility-monitoring]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
       env:
-        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-      run: |
-        # Add your deployment steps here
-        echo "Deploying to production..." 
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Send email notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: CI/CD Pipeline Status - ${{ github.workflow }}
+        body: |
+          Pipeline Status: ${{ job.status }}
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+          Workflow: ${{ github.workflow }}
+          Job: ${{ github.job }}
+          Duration: ${{ steps.duration.outputs.duration }}
+        to: ${{ secrets.EMAIL_NOTIFICATION }}
+        from: CI/CD Pipeline <ci@aiquira.com>
+
+    - name: Create GitHub release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        body: |
+          ## Changes
+          - Automated release
+          - Build: ${{ github.sha }}
+          - Environment: ${{ matrix.environment }}
+        draft: false
+        prerelease: false 

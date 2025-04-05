@@ -1,0 +1,39 @@
+{
+  "analysis": {
+    "riskScore": {
+      "title": "リスクスコア",
+      "low": "低リスク",
+      "medium": "中リスク",
+      "high": "高リスク"
+    },
+    "marketInsights": {
+      "title": "市場分析",
+      "trend": {
+        "positive": "ポジティブ",
+        "neutral": "中立",
+        "negative": "ネガティブ"
+      },
+      "confidence": "信頼度",
+      "factors": "主要要因"
+    },
+    "issues": {
+      "title": "特定された問題",
+      "severity": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "impact": "影響",
+      "resolution": "推奨解決策"
+    },
+    "recommendations": {
+      "title": "推奨事項"
+    }
+  },
+  "common": {
+    "loading": "分析を読み込み中...",
+    "error": "分析の読み込み中にエラーが発生しました",
+    "retry": "再試行",
+    "refresh": "更新"
+  }
+} 

@@ -1,0 +1,39 @@
+{
+  "analysis": {
+    "riskScore": {
+      "title": "Puntuación de Riesgo",
+      "low": "Riesgo Bajo",
+      "medium": "Riesgo Medio",
+      "high": "Riesgo Alto"
+    },
+    "marketInsights": {
+      "title": "Perspectivas del Mercado",
+      "trend": {
+        "positive": "Positivo",
+        "neutral": "Neutral",
+        "negative": "Negativo"
+      },
+      "confidence": "Nivel de Confianza",
+      "factors": "Factores Clave"
+    },
+    "issues": {
+      "title": "Problemas Identificados",
+      "severity": {
+        "high": "Alto",
+        "medium": "Medio",
+        "low": "Bajo"
+      },
+      "impact": "Impacto",
+      "resolution": "Resolución Recomendada"
+    },
+    "recommendations": {
+      "title": "Recomendaciones"
+    }
+  },
+  "common": {
+    "loading": "Cargando análisis...",
+    "error": "Error al cargar el análisis",
+    "retry": "Reintentar",
+    "refresh": "Actualizar"
+  }
+} 

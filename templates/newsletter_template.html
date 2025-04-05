@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .trend {
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #4CAF50;
+        }
+        .trend.up {
+            border-left-color: #4CAF50;
+        }
+        .trend.down {
+            border-left-color: #f44336;
+        }
+        .deal {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .insight {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+        .chart {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .metric {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .metric .label {
+            font-size: 14px;
+            color: #666;
+        }
+        .advanced-section {
+            background: #f0f7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .forecast {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .forecast-chart {
+            width: 100%;
+            height: 300px;
+            margin: 15px 0;
+        }
+        .sentiment-analysis {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .sentiment-card {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .correlation-matrix {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .geographic-distribution {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .interactive-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .control-button {
+            padding: 8px 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .control-button:hover {
+            background: #1976D2;
+        }
+        .anomaly {
+            border-left: 4px solid #ff5722;
+            padding-left: 15px;
+            margin: 10px 0;
+        }
+        .cluster {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ title }}</h1>
+        <p>{{ date }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Market Summary</h2>
+        <p>{{ summary }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Key Market Trends</h2>
+        {% for category in trends %}
+        <h3>{{ category.category }}</h3>
+        {% for trend in category.trends %}
+        <div class="trend {{ trend.direction }}">
+            <h4>{{ trend.title }}</h4>
+            <p>{{ trend.description }}</p>
+            {% if trend.metrics %}
+            <div class="metrics">
+                {% for metric in trend.metrics %}
+                <div class="metric">
+                    <div class="value">{{ metric.value }}</div>
+                    <div class="label">{{ metric.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if trend.chart %}
+            <img class="chart" src="data:image/png;base64,{{ trend.chart }}" alt="{{ trend.title }} Chart">
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Notable Deals</h2>
+        {% for deal in deals %}
+        <div class="deal">
+            <h4>{{ deal.title }}</h4>
+            <p><strong>Value:</strong> {{ deal.value }}</p>
+            <p><strong>Industry:</strong> {{ deal.industry }}</p>
+            <p>{{ deal.description }}</p>
+            {% if deal.metrics %}
+            <div class="metrics">
+                {% for metric in deal.metrics %}
+                <div class="metric">
+                    <div class="value">{{ metric.value }}</div>
+                    <div class="label">{{ metric.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Industry Insights</h2>
+        {% for insight in insights %}
+        <div class="insight">
+            <h4>{{ insight.title }}</h4>
+            <p>{{ insight.description }}</p>
+            {% if insight.recommendations %}
+            <h5>Recommendations:</h5>
+            <ul>
+                {% for rec in insight.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if insight.chart %}
+            <img class="chart" src="data:image/png;base64,{{ insight.chart }}" alt="{{ insight.title }} Chart">
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="advanced-section">
+        <h2>Market Forecasts</h2>
+        {% for forecast in forecasts %}
+        <div class="forecast">
+            <h3>{{ forecast.metric }} Forecast</h3>
+            <div class="forecast-chart">
+                {{ forecast.chart | safe }}
+            </div>
+            <div class="forecast-details">
+                <h4>Key Predictions</h4>
+                <ul>
+                    {% for prediction in forecast.key_predictions %}
+                    <li>{{ prediction }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Confidence Level:</strong> {{ forecast.confidence }}%</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="advanced-section">
+        <h2>Sentiment Analysis</h2>
+        <div class="sentiment-analysis">
+            <div class="sentiment-card">
+                <h3>Overall Market Sentiment</h3>
+                <div class="sentiment-gauge">
+                    {{ sentiment.gauge_chart | safe }}
+                </div>
+                <p>{{ sentiment.summary }}</p>
+            </div>
+            <div class="sentiment-card">
+                <h3>Key Topics</h3>
+                <div class="wordcloud">
+                    {{ sentiment.wordcloud | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="advanced-section">
+        <h2>Geographic Distribution</h2>
+        <div class="geographic-distribution">
+            {{ geographic.map | safe }}
+        </div>
+        <div class="interactive-controls">
+            <button class="control-button" onclick="updateMap('traffic')">Traffic</button>
+            <button class="control-button" onclick="updateMap('revenue')">Revenue</button>
+            <button class="control-button" onclick="updateMap('deals')">Deals</button>
+        </div>
+    </div>
+
+    <div class="advanced-section">
+        <h2>Anomaly Detection</h2>
+        {% for anomaly in anomalies %}
+        <div class="anomaly">
+            <h3>{{ anomaly.metric }}</h3>
+            <p><strong>Detected on:</strong> {{ anomaly.date }}</p>
+            <p><strong>Severity:</strong> {{ anomaly.severity }}</p>
+            <p>{{ anomaly.description }}</p>
+            <div class="anomaly-chart">
+                {{ anomaly.chart | safe }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="advanced-section">
+        <h2>Market Segmentation</h2>
+        {% for cluster in clusters %}
+        <div class="cluster">
+            <h3>{{ cluster.name }}</h3>
+            <p>{{ cluster.description }}</p>
+            <div class="cluster-metrics">
+                <div class="metric">
+                    <div class="value">{{ cluster.size }}</div>
+                    <div class="label">Members</div>
+                </div>
+                <div class="metric">
+                    <div class="value">{{ cluster.growth }}%</div>
+                    <div class="label">Growth Rate</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="advanced-section">
+        <h2>Correlation Analysis</h2>
+        <div class="correlation-matrix">
+            {{ correlation.heatmap | safe }}
+        </div>
+        <div class="correlation-insights">
+            <h3>Key Relationships</h3>
+            <ul>
+                {% for insight in correlation.insights %}
+                <li>{{ insight }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This newsletter is generated by AIQuira Market Reporting System</p>
+        <p>To customize your report preferences or notification settings, visit your <a href="{{ preferences_url }}">preferences page</a></p>
+        <p>To unsubscribe, click <a href="{{ unsubscribe_url }}">here</a></p>
+    </div>
+
+    <script>
+        // Interactive features
+        function updateMap(metric) {
+            // Implementation for map updates
+        }
+
+        function toggleChart(chartId, type) {
+            // Implementation for chart type switching
+        }
+
+        function exportData(format) {
+            // Implementation for data export
+        }
+    </script>
+</body>
+</html> 
